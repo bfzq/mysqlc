@@ -14,8 +14,8 @@ Mysqlc::~Mysqlc() {
 }
 
 
-bool Mysqlc::connect(std::string host, std::string user, std::string password, std::string db, int port) {
-	if (!mysql_real_connect(_mysql, host.c_str(), user.c_str(), password.c_str(), db.c_str(), port, NULL, 0)) {
+bool Mysqlc::connect(const char* host, const char* user, const char* password, const char* db, int port) {
+	if (!mysql_real_connect(_mysql, host, user, password, db, port, NULL, 0)) {
 		return false;
 	}
 	return true;
@@ -41,18 +41,30 @@ bool Mysqlc::setCharacterSet(const char* csname) {
 }
 
 bool Mysqlc::createDataBase(const char* dbname) {
-	std::string sql = "create database " + std::string(dbname) ;
-        return execute(sql,nullptr) ;
+	char* sql = (char*)malloc(sizeof(char) * (strlen("create database ") + strlen(dbname))) ;
+	strcpy(sql, "create database ") ;
+	strcpy(sql, dbname) ;
+        bool ret = execute((const char*)sql,nullptr) ;
+	free(sql) ;
+	return ret ;
 }
 
 bool Mysqlc::dropDataBase(const char* dbname) {
-	std::string sql = "drop database " + std::string(dbname) ;
-	return execute(sql,nullptr) ;
+	char* sql = (char*)malloc(sizeof(char) * (strlen("drop database ") + strlen(dbname))) ;
+        strcpy(sql, "drop database ") ;
+        strcpy(sql, dbname) ;
+        bool ret = execute((const char*)sql,nullptr) ;
+        free(sql) ;
+        return ret ;
 }
 
 
 bool Mysqlc::begin() {
 	return execute("begin",nullptr) ;
+}
+
+bool Mysqlc::startTransaction() {
+	return begin() ;
 }
 
 bool Mysqlc::commit() {
@@ -90,7 +102,7 @@ bool Mysqlc::autoCommit(bool mode) {
 		return false ;
 }
 
-bool Mysqlc::execute(std::string sql,std::function<void(long)> affected_rows) {
+bool Mysqlc::execute(const char* sql,std::function<void(long)> affected_rows) {
 	return baseQuery(sql,[&](MYSQL_RES* res) {
 		if(nullptr == res) {
 			if (0 == mysql_field_count(_mysql)) {
@@ -107,8 +119,8 @@ bool Mysqlc::execute(std::string sql,std::function<void(long)> affected_rows) {
 	});
 }
 
-bool Mysqlc::baseQuery(std::string sql, std::function<bool(MYSQL_RES*)> query_reslut) {
-	if (!mysql_query(_mysql, sql.c_str())) {
+bool Mysqlc::baseQuery(const char* sql, std::function<bool(MYSQL_RES*)> query_reslut) {
+	if (!mysql_query(_mysql, sql)) {
 		MYSQL_RES* res = mysql_store_result(_mysql) ;
 		bool retVal = query_reslut(res) ;
 		if (res) mysql_free_result(res);
@@ -120,14 +132,16 @@ bool Mysqlc::baseQuery(std::string sql, std::function<bool(MYSQL_RES*)> query_re
 }
 
 
-bool Mysqlc::query(std::string sql, std::function<bool(MYSQL_ROW)> data_rows, std::function<void(void)> empty) {
+bool Mysqlc::query(const char* sql, std::function<bool(MYSQL_ROW)> data_rows, std::function<void(void)> empty) {
 	return baseQuery(sql, [&](MYSQL_RES* res){
 		if (res) {
 			bool retVal = true;
 			if (mysql_num_rows(res)) {
-				MYSQL_ROW row ;
-				while ((row = mysql_fetch_row(res)) != NULL && retVal) {
-					retVal = data_rows(row);
+				if (data_rows) {
+					MYSQL_ROW row ;
+					while ((row = mysql_fetch_row(res)) != NULL && retVal) {
+						retVal = data_rows(row);
+					}
 				}
 			}else {
 				if (empty) {
