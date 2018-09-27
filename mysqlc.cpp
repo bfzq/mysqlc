@@ -24,6 +24,7 @@ bool Mysqlc::connect(std::string host, std::string user, std::string password, s
 bool Mysqlc::disConnect() {
 	if (_mysql) {
 		mysql_close(_mysql);
+		_mysql = nullptr ;
 	}
 	if (nullptr == _mysql) {
 		return true ;
