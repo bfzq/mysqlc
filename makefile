@@ -24,7 +24,5 @@ $(PROGRAM):$(OBJECTS)
 	$(CC) $(LFLAGS) -o $(PROGRAM) $(OBJECTS) $(LIBLAGS)
 %.o:%.cpp
 	$(CC) $(DEBUG) $(CFLAGS)  -c $< -o $@
-%.o:$(COMMON)/%.cpp
-	$(CC) $(DEBUG) $(CFLAGS)  -c $< -o $@
 clean:
 	rm -rf *.o $(PROGRAM)
