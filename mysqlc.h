@@ -34,8 +34,6 @@ public:
 	const char* error() ; // 获取错误信息
 private:
 	bool baseQuery(const char* sql, std::function<bool(MYSQL_RES*)> query_reslut) ; // 执行SQL
-public:
-	MYSQL getMYSQL() ;
 };
 
 #endif // !__MYSQLC__
