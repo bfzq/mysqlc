@@ -17,9 +17,9 @@ Mysqlc::~Mysqlc() {
 bool Mysqlc::connect(const char* host, const char* user, const char* password, const char* db, int port) {
 	if (!_mysql) {
 		_mysql = mysql_init(nullptr);
-		if (!mysql_real_connect(_mysql, host, user, password, db, port, NULL, 0)) {
-			return false;
-		}
+	}
+	if (!mysql_real_connect(_mysql, host, user, password, db, port, NULL, 0)) {
+		return false;
 	}
 	return true;
 }
