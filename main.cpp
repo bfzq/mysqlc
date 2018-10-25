@@ -2,17 +2,22 @@
 #include "mysqlc.h"
 
 int main() {
+	_mysql_library_init
 	Mysqlc* mysqlc = new Mysqlc() ;
 	mysqlc->connect("127.0.0.1","root","!QAZ2wsx","t1",3306) ;
 	mysqlc->setCharacterSet("utf8mb4") ;
 	mysqlc->createDataBase("test2") ;
+	printf("%s\n",mysqlc->error()) ;
 	mysqlc->use("test2") ;
+	printf("%u,%s\n",mysqlc->errNo(),mysqlc->error()) ;
+	
+
 	mysqlc->begin() ;
 	
-	mysqlc->execute("create table t1(id int)",[](long num) {
+	mysqlc->execute("create table if not exists t1(id int)",[](long num) {
 		printf("create table t1(id int), %ld\n", num) ;
 	}) ;
-	printf("1. %s\n",mysqlc->error()) ;
+	printf("%s\n",mysqlc->error()) ;
 	
 	mysqlc->execute("insert into t1(id) value(1)", [](long num) {
 		printf("insert into t1(id) value(1), %ld\n", num) ;
@@ -34,5 +39,6 @@ int main() {
 	
 	mysqlc->disConnect();
 	delete mysqlc ;
+	_mysql_library_end
 	return 0 ;
 }

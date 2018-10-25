@@ -32,6 +32,7 @@ public:
 	bool commit() ; // 提交
 	bool rollback() ; // 回滚
 	const char* error() ; // 获取错误信息
+	int errNo() ; // 获取错误代码
 private:
 	bool baseQuery(const char* sql, std::function<bool(MYSQL_RES*)> query_reslut) ; // 执行SQL
 };

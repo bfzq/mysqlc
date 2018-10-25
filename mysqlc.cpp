@@ -90,6 +90,10 @@ const char* Mysqlc::error() {
 	return mysql_error(_mysql) ;
 }
 
+int Mysqlc::errNo() {
+	return mysql_errno(_mysql) ;
+}
+
 
 bool Mysqlc::use(const char* dbname) {
 	if (mysql_select_db(_mysql, dbname)) {

@@ -17,7 +17,7 @@ CFLAGS = -Wall -std=c++11 $(MYSQL_INCLUDE)
 LFLAGS = -ldl -lpthread --std=c++11 
 LIBLAGS = $(MYSQL_LIB)
 
-OBJECTS = main.o mysqlc.o
+OBJECTS = mysqlc.o main.o
 
 
 $(PROGRAM):$(OBJECTS)
