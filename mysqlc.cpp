@@ -1,5 +1,19 @@
 #include "mysqlc.h"
 
+MysqlcException::MysqlcException(unsigned int errorNo, char* error) {
+	_errno = errorNo ;
+	strcpy(_error, error) ;	
+}
+
+MysqlcException::~MysqlcException() {}
+
+void MysqlcException::what() const {
+	printf("Error : %u %s\n",_errno,_error) ;
+}
+
+unsigned int MysqlcException::errorNo() const {
+	return _errno ;
+}
 
 
 Mysqlc::Mysqlc() {
@@ -19,7 +33,7 @@ bool Mysqlc::connect(const char* host, const char* user, const char* password, c
 		_mysql = mysql_init(nullptr);
 	}
 	if (!mysql_real_connect(_mysql, host, user, password, db, port, NULL, 0)) {
-		return false;
+		throw MysqlcException(errNo(), (char*)error()) ;
 	}
 	return true;
 }
@@ -38,7 +52,7 @@ bool Mysqlc::disConnect() {
 
 bool Mysqlc::setCharacterSet(const char* csname) {
 	if (mysql_set_character_set(_mysql, csname)) {
-		return false ;
+		throw MysqlcException(errNo(), (char*)error()) ;
 	}
 	return true ;
 }
@@ -49,6 +63,9 @@ bool Mysqlc::createDataBase(const char* dbname) {
 	strcat(sql, dbname) ;
         bool ret = execute((const char*)sql,nullptr) ;
 	free(sql) ;
+	if (!ret) {
+		throw MysqlcException(errNo(), (char*)error()) ;
+	}
 	return ret ;
 }
 
@@ -58,12 +75,18 @@ bool Mysqlc::dropDataBase(const char* dbname) {
         strcat(sql, dbname) ;
         bool ret = execute((const char*)sql,nullptr) ;
         free(sql) ;
+	if (!ret) {
+		throw MysqlcException(errNo(), (char*)error()) ;
+	}	
         return ret ;
 }
 
 
 bool Mysqlc::begin() {
-	return execute("begin",nullptr) ;
+	if (!execute("begin",nullptr)) {
+		throw MysqlcException(errNo(), (char*)error()) ;
+	}
+	return true ;
 }
 
 bool Mysqlc::startTransaction() {
@@ -74,7 +97,7 @@ bool Mysqlc::commit() {
 	if (!mysql_commit(_mysql)) {
 		return true ;
 	} else {
-		return false ;
+		throw MysqlcException(errNo(), (char*)error()) ;
 	}
 }
 
@@ -82,7 +105,7 @@ bool Mysqlc::rollback() {
 	if (!mysql_rollback(_mysql)) {
 		return true ;
 	} else {
-		return false ;
+		throw MysqlcException(errNo(), (char*)error()) ;
 	}
 }
 
@@ -90,23 +113,23 @@ const char* Mysqlc::error() {
 	return mysql_error(_mysql) ;
 }
 
-int Mysqlc::errNo() {
+unsigned int Mysqlc::errNo() {
 	return mysql_errno(_mysql) ;
 }
 
 
 bool Mysqlc::use(const char* dbname) {
 	if (mysql_select_db(_mysql, dbname)) {
-		return false ;
+		throw MysqlcException(errNo(), (char*)error()) ;
 	}
 	return true ;
 }
 
 bool Mysqlc::autoCommit(bool mode) {
-		if (!mysql_autocommit(_mysql,mode ? '1' : '0')) {
-			return true ;
+		if (mysql_autocommit(_mysql,mode ? '1' : '0')) {
+			throw MysqlcException(errNo(), (char*)error()) ;
 		}
-		return false ;
+		return true ;
 }
 
 bool Mysqlc::execute(const char* sql,std::function<void(long)> affected_rows) {
@@ -118,10 +141,10 @@ bool Mysqlc::execute(const char* sql,std::function<void(long)> affected_rows) {
 				}
 				return true ;
 			} else {
-				return false ;
+				throw MysqlcException(errNo(), (char*)error()) ;
 			}
 		} else {
-			return false ;
+			throw MysqlcException(errNo(), (char*)error()) ;
 		}
 	});
 }
@@ -134,7 +157,7 @@ bool Mysqlc::baseQuery(const char* sql, std::function<bool(MYSQL_RES*)> query_re
 		return retVal ;
 	}
 	else {
-		return false;
+		throw MysqlcException(errNo(), (char*)error()) ;
 	}
 }
 
@@ -157,7 +180,7 @@ bool Mysqlc::query(const char* sql, std::function<bool(MYSQL_ROW)> data_rows, st
 			}
 			return true ;
 		} else {
-			return false ;
+			throw MysqlcException(errNo(), (char*)error()) ;
 		}
 	}) ;
 }

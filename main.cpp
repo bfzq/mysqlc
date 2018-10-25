@@ -3,6 +3,7 @@
 
 int main() {
 	_mysql_library_init
+	try{
 	Mysqlc* mysqlc = new Mysqlc() ;
 	mysqlc->connect("127.0.0.1","root","!QAZ2wsx","t1",3306) ;
 	mysqlc->setCharacterSet("utf8mb4") ;
@@ -39,6 +40,10 @@ int main() {
 	
 	mysqlc->disConnect();
 	delete mysqlc ;
+	}
+	catch(MysqlcException & me) {
+		me.what() ;
+	}
 	_mysql_library_end
 	return 0 ;
 }
