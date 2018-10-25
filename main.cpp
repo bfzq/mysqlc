@@ -7,7 +7,7 @@ int main() {
 	try{
 	mysqlc->connect("127.0.0.1","root","!QAZ2wsx","t1",3306) ;
 	mysqlc->setCharacterSet("utf8mb4") ;
-	mysqlc->createDataBase("test2") ;
+	mysqlc->createDataBase("test2test2ttest2test2test2test2test2test2test2test2test2test2test2test2testtest2test2test2test2test2test2test2test2test2test2test2test2testtest2test2test2test2test2test2test2test2test2test2test2test2testest2test2test2test2test2test2test2test2test2test2test") ;
 	printf("%s\n",mysqlc->error()) ;
 	mysqlc->use("test2") ;
 	printf("%u,%s\n",mysqlc->errNo(),mysqlc->error()) ;

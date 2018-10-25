@@ -25,23 +25,6 @@ private:
 };
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 class Mysqlc {
 public:
 	Mysqlc();
