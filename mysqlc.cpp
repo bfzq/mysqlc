@@ -58,11 +58,10 @@ bool Mysqlc::setCharacterSet(const char* csname) {
 }
 
 bool Mysqlc::createDataBase(const char* dbname) {
-	char* sql = (char*)malloc(sizeof(char) * (strlen("create database ") + strlen(dbname))) ;
+	char sql[128];
 	strcpy(sql, "create database ") ;
 	strcat(sql, dbname) ;
         bool ret = execute((const char*)sql,nullptr) ;
-	free(sql) ;
 	if (!ret) {
 		throw MysqlcException(errNo(), (char*)error()) ;
 	}
@@ -70,11 +69,10 @@ bool Mysqlc::createDataBase(const char* dbname) {
 }
 
 bool Mysqlc::dropDataBase(const char* dbname) {
-	char* sql = (char*)malloc(sizeof(char) * (strlen("drop database ") + strlen(dbname))) ;
-        strcpy(sql, "drop database ") ;
+        char sql[128];
+	strcpy(sql, "drop database ") ;
         strcat(sql, dbname) ;
         bool ret = execute((const char*)sql,nullptr) ;
-        free(sql) ;
 	if (!ret) {
 		throw MysqlcException(errNo(), (char*)error()) ;
 	}	

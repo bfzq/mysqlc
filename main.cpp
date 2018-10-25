@@ -3,8 +3,8 @@
 
 int main() {
 	_mysql_library_init
-	try{
 	Mysqlc* mysqlc = new Mysqlc() ;
+	try{
 	mysqlc->connect("127.0.0.1","root","!QAZ2wsx","t1",3306) ;
 	mysqlc->setCharacterSet("utf8mb4") ;
 	mysqlc->createDataBase("test2") ;
@@ -39,11 +39,11 @@ int main() {
 	printf("%s\n",mysqlc->error()) ;
 	
 	mysqlc->disConnect();
-	delete mysqlc ;
 	}
 	catch(MysqlcException & me) {
 		me.what() ;
 	}
+	delete mysqlc;
 	_mysql_library_end
 	return 0 ;
 }
