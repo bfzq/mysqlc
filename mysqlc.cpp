@@ -60,7 +60,7 @@ bool Mysqlc::setCharacterSet(const char* csname) {
 
 
 bool Mysqlc::createDataBase(const char* dbname) {
-	std::string sql = "create database ";
+	std::string sql = "create database if not exists ";
 	sql = sql + std::string(dbname) ;
         bool ret = execute(sql.c_str(),nullptr) ;
 	if (!ret) {
@@ -70,7 +70,7 @@ bool Mysqlc::createDataBase(const char* dbname) {
 }
 
 bool Mysqlc::dropDataBase(const char* dbname) {
-	std::string sql = "drop database ";
+	std::string sql = "drop database if exists ";
         sql = sql + std::string(dbname) ;
         bool ret = execute(sql.c_str(),nullptr) ;
 	if (!ret) {
